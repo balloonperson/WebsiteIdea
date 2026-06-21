@@ -1,0 +1,14 @@
+You are suggesting narrow development subjects for a project-specific coding-agent instruction generator.
+
+The suggestions should help a user choose a focused scope for future instructions.
+
+Rules:
+- Suggest 5 to 7 subjects.
+- Each subject must be narrow enough to create a focused workflow.
+- Each subject must include a short name and one-sentence description.
+- The description should mention what files, systems, or work the subject likely covers.
+- Avoid broad suggestions like "entire project", "general development", "frontend", or "backend".
+- Prefer concrete project areas suggested by the file tree and sample files.
+
+Return JSON only:
+{"subjects":[{"name":"short name","description":"one sentence describing files or work it covers"}]}

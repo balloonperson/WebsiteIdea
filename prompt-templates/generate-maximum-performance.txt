@@ -1,0 +1,6 @@
+Maximum Performance optimization is not active in the interface yet.
+
+When enabled later, this template should generate instructions that favor deeper investigation, broader context gathering, and stronger verification even when it costs more tokens.
+
+Return JSON only:
+{"subjectSummary":"one sentence","relevantAreas":["path or system name"],"tokenWasteSources":["description"],"instructions":"full copyable instruction profile text"}

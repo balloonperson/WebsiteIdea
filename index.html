@@ -3,13 +3,102 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Website</title>
+    <title>Coding Agent Instruction Generator</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main>
-      <h1>website</h1>
+    <div class="model-banner" id="model-banner">
+      Current instruction-generator model: loading...
+    </div>
+    <main class="page">
+      <header class="hero">
+        <p class="eyebrow">Cost-efficient coding-agent setup</p>
+        <h1>Generate project-specific instructions</h1>
+        <p>
+          Upload a zipped project, choose the model and subject, then generate a focused instruction profile.
+        </p>
+      </header>
+
+      <section class="card">
+        <label class="section-label" for="project-upload">1. Import project</label>
+        <div class="upload-box" id="upload-box">
+          <input id="project-upload" type="file" accept=".zip,application/zip" />
+          <p><strong>Choose a .zip project file</strong> or drop it here.</p>
+          <small>Generated folders and large/binary files are skipped automatically.</small>
+        </div>
+        <p class="status" id="upload-status">No project uploaded yet.</p>
+        <p class="error" id="upload-error" hidden></p>
+      </section>
+
+      <section class="card grid-card">
+        <div>
+          <label class="section-label" for="model-select">2. Model to optimize for</label>
+          <select id="model-select">
+            <option value="">Select a model</option>
+            <option value="Claude Sonnet">Claude Sonnet</option>
+            <option value="Claude Opus">Claude Opus</option>
+            <option value="GPT">GPT</option>
+            <option value="Gemini">Gemini</option>
+            <option value="Other">Other</option>
+          </select>
+          <input id="other-model" type="text" placeholder="Enter model name" hidden />
+        </div>
+      </section>
+
+      <section class="card">
+        <label class="section-label">3. Optimization path</label>
+        <div class="path-grid">
+          <button class="path-card active" type="button" data-path="cost">
+            <strong>Cost Efficient</strong>
+            <span>Reduce unnecessary investigation and tool use while keeping enough evidence.</span>
+          </button>
+          <button class="path-card inactive" type="button" aria-label="Balanced coming soon">
+            <strong>Balanced</strong>
+            <span>Coming soon</span>
+          </button>
+          <button class="path-card inactive" type="button" aria-label="Maximum Performance coming soon">
+            <strong>Maximum Performance</strong>
+            <span>Coming soon</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="card">
+        <label class="section-label" for="subject-input">4. Subject to optimize for</label>
+        <div class="subject-row">
+          <input
+            id="subject-input"
+            type="text"
+            placeholder="Example: Authentication UI, enemy navigation, feature/my-branch"
+          />
+          <button id="suggest-button" type="button" disabled>Suggest Subjects</button>
+        </div>
+        <p class="help-text">
+          This can be a branch name, feature area, development topic, or any scope you want the instructions focused on.
+        </p>
+        <select id="suggestions-select" hidden>
+          <option value="">Choose a suggested subject</option>
+        </select>
+        <p class="error" id="suggest-error" hidden></p>
+      </section>
+
+      <section class="run-section">
+        <button id="run-button" class="run-button" type="button" disabled>Run</button>
+        <p class="status" id="run-status">Upload a project, select a model, and enter a subject to begin.</p>
+      </section>
+
+      <section class="card">
+        <label class="section-label" for="output">Generated Instructions</label>
+        <textarea id="output" readonly placeholder="Generated instructions will appear here."></textarea>
+        <div class="actions">
+          <button id="copy-button" type="button" disabled>Copy</button>
+          <button id="clear-button" type="button">Clear</button>
+        </div>
+        <p class="error" id="run-error" hidden></p>
+      </section>
     </main>
-    <script src="script.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script type="module" src="js/app.js"></script>
   </body>
 </html>

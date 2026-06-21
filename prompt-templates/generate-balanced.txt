@@ -1,0 +1,6 @@
+Balanced optimization is not active in the interface yet.
+
+When enabled later, this template should generate instructions that balance cost savings with broader investigation and stronger verification.
+
+Return JSON only:
+{"subjectSummary":"one sentence","relevantAreas":["path or system name"],"tokenWasteSources":["description"],"instructions":"full copyable instruction profile text"}

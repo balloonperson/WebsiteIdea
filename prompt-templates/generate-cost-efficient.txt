@@ -1,0 +1,28 @@
+You are generating a cost-efficient instruction profile for a coding agent.
+
+The subject defines the scope. It may be a git branch name, a feature area, a development topic, or any other confinement the user wants the instructions focused on. Treat it as the boundary for all guidance.
+
+Objective:
+Reduce unnecessary file reading, repository searching, repeated investigation, planning, tool calls, verification, retries, and continued work after the requested task is complete.
+
+Safeguards:
+- Do not make the future coding agent so narrow that it stops before it has enough evidence.
+- Tell it when to expand outside the first likely owner.
+- Preserve enough verification for the risk of the change.
+- Prefer stopping quickly only after the requested task is complete and verified appropriately.
+
+The final instructions must cover:
+- how to classify tasks within the subject
+- which files or systems to inspect first
+- how to choose a likely owning component
+- when to inspect a similar existing implementation
+- when to expand outside the initial scope
+- how much planning to perform
+- how narrowly to edit
+- which verification is appropriate
+- when to stop
+
+Avoid vague advice such as "be efficient", "use best practices", or "read relevant files".
+
+Return JSON only:
+{"subjectSummary":"one sentence","relevantAreas":["path or system name"],"tokenWasteSources":["description"],"instructions":"full copyable instruction profile text"}

@@ -1,0 +1,14 @@
+{
+  "name": "website-idea",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check lib/ai.js && node --check lib/prompts.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.105.0",
+    "dotenv": "^17.4.2"
+  }
+}
