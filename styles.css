@@ -204,6 +204,57 @@ input[type="text"] {
   color: #172033;
 }
 
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 12px;
+  color: #aeb8c9;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #dce3ef;
+}
+
+.github-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.github-row input[type="url"] {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #172033;
+}
+
+.github-row button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #172033;
+  white-space: nowrap;
+}
+
+.github-row button:hover:not(:disabled) {
+  border-color: #087f5b;
+  color: #087f5b;
+}
+
 #suggestions-select {
   margin-top: 12px;
 }

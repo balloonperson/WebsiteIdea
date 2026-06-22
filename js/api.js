@@ -29,6 +29,10 @@ export async function generateInstructions({
   });
 }
 
+export async function loadGithubRepo({ repoUrl }) {
+  return postJson("/api/github", { repoUrl });
+}
+
 async function postJson(url, body) {
   const response = await fetch(url, {
     method: "POST",

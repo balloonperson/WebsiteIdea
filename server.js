@@ -4,6 +4,7 @@ import { createServer } from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { callAi, parseJsonResponse } from "./lib/ai.js";
+import { fetchRepoFiles } from "./lib/github.js";
 import { buildGeneratePrompt, buildSuggestPrompt } from "./lib/prompts.js";
 
 const port = process.env.PORT || 3000;
@@ -26,6 +27,10 @@ const server = createServer(async (req, res) => {
 
     if (req.method === "POST" && url.pathname === "/api/generate") {
       return handleGenerate(req, res);
+    }
+
+    if (req.method === "POST" && url.pathname === "/api/github") {
+      return handleGithub(req, res);
     }
 
     if (req.method === "GET") {
@@ -94,6 +99,21 @@ async function handleGenerate(req, res) {
     relevantAreas: parsed.relevantAreas || [],
     tokenWasteSources: parsed.tokenWasteSources || []
   });
+}
+
+async function handleGithub(req, res) {
+  const { repoUrl } = await readJson(req);
+
+  if (!repoUrl || typeof repoUrl !== "string") {
+    return sendJson(res, 400, { error: "Missing repoUrl." });
+  }
+
+  try {
+    const project = await fetchRepoFiles(repoUrl.trim());
+    return sendJson(res, 200, project);
+  } catch (error) {
+    return sendError(res, error);
+  }
 }
 
 function capFiles(files, maxChars) {

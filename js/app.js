@@ -1,4 +1,4 @@
-import { generateInstructions, getConfig, suggestSubjects } from "./api.js";
+import { generateInstructions, getConfig, loadGithubRepo, suggestSubjects } from "./api.js";
 import { extractProjectZip } from "./zip.js";
 
 const state = {
@@ -13,6 +13,10 @@ const els = {
   uploadInput: document.querySelector("#project-upload"),
   uploadStatus: document.querySelector("#upload-status"),
   uploadError: document.querySelector("#upload-error"),
+  githubUrl: document.querySelector("#github-url"),
+  githubLoadButton: document.querySelector("#github-load-button"),
+  githubStatus: document.querySelector("#github-status"),
+  githubError: document.querySelector("#github-error"),
   modelSelect: document.querySelector("#model-select"),
   otherModel: document.querySelector("#other-model"),
   subjectInput: document.querySelector("#subject-input"),
@@ -49,6 +53,16 @@ els.uploadBox.addEventListener("drop", async (event) => {
   const [file] = event.dataTransfer.files;
   if (file) {
     await handleZip(file);
+  }
+});
+
+els.githubLoadButton.addEventListener("click", async () => {
+  await handleGithubUrl();
+});
+
+els.githubUrl.addEventListener("keydown", async (event) => {
+  if (event.key === "Enter") {
+    await handleGithubUrl();
   }
 });
 
@@ -155,6 +169,28 @@ async function handleZip(file) {
     els.uploadStatus.textContent = "No project uploaded yet.";
     showError(els.uploadError, error.message);
   } finally {
+    updateRunState();
+  }
+}
+
+async function handleGithubUrl() {
+  const repoUrl = els.githubUrl.value.trim();
+  if (!repoUrl) return;
+
+  clearError(els.githubError);
+  els.githubStatus.textContent = "Downloading repository...";
+  els.githubLoadButton.disabled = true;
+
+  try {
+    const project = await loadGithubRepo({ repoUrl });
+    state.project = project;
+    els.githubStatus.textContent = `${project.fileName}: ${project.acceptedCount} files accepted, ${project.skippedCount} skipped.`;
+    els.suggestButton.disabled = false;
+  } catch (error) {
+    showError(els.githubError, error.message);
+    els.githubStatus.textContent = "";
+  } finally {
+    els.githubLoadButton.disabled = false;
     updateRunState();
   }
 }
