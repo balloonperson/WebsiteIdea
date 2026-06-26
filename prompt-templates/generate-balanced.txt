@@ -2,5 +2,7 @@ Balanced optimization is not active in the interface yet.
 
 When enabled later, this template should generate instructions that balance cost savings with broader investigation and stronger verification.
 
+The solverAnalysis findings should weigh both cost reduction and correctness improvements equally.
+
 Return JSON only:
-{"subjectSummary":"one sentence","relevantAreas":["path or system name"],"tokenWasteSources":["description"],"instructions":"full copyable instruction profile text"}
+{"subjectSummary":"one sentence","relevantAreas":["path or system name"],"solverAnalysis":[{"type":"uniqueness","title":"short descriptive phrase","content":"concise explanation"}],"instructions":"full copyable instruction profile text"}

@@ -8,6 +8,7 @@ import { fetchRepoFiles } from "./lib/github.js";
 import { buildGeneratePrompt, buildSuggestPrompt } from "./lib/prompts.js";
 
 const port = process.env.PORT || 3000;
+const host = process.env.HOST || "127.0.0.1";
 const MAX_CONTEXT_CHARS = 150000;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,15 +23,15 @@ const server = createServer(async (req, res) => {
     }
 
     if (req.method === "POST" && url.pathname === "/api/suggest") {
-      return handleSuggest(req, res);
+      return await handleSuggest(req, res);
     }
 
     if (req.method === "POST" && url.pathname === "/api/generate") {
-      return handleGenerate(req, res);
+      return await handleGenerate(req, res);
     }
 
     if (req.method === "POST" && url.pathname === "/api/github") {
-      return handleGithub(req, res);
+      return await handleGithub(req, res);
     }
 
     if (req.method === "GET") {
@@ -43,8 +44,8 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(port, () => {
-  console.log(`WebsiteIdea app running at http://localhost:${port}`);
+server.listen(port, host, () => {
+  console.log(`WebsiteIdea app running at http://${host}:${port}`);
 });
 
 async function handleSuggest(req, res) {
@@ -93,12 +94,40 @@ async function handleGenerate(req, res) {
   const raw = await callAi(prompt);
   const parsed = parseJsonResponse(raw, "instructions");
 
+  const rawAnalysis = Array.isArray(parsed.solverAnalysis)
+    ? parsed.solverAnalysis
+    : Array.isArray(parsed.tokenWasteSources)
+      ? parsed.tokenWasteSources.map((content) => ({
+          type: "waste-source",
+          title: "Likely token waste",
+          content
+        }))
+      : [];
+
+  const solverAnalysis = rawAnalysis.map(normalizeFinding).filter(Boolean);
+
+  if (rawAnalysis.length !== solverAnalysis.length) {
+    console.warn(`Filtered ${rawAnalysis.length - solverAnalysis.length} malformed solver findings`);
+  }
+  if (solverAnalysis.length > 0 && (solverAnalysis.length < 3 || solverAnalysis.length > 25)) {
+    console.warn(`Unusual solverAnalysis count: ${solverAnalysis.length}`);
+  }
+
   return sendJson(res, 200, {
     instructions: parsed.instructions,
     subjectSummary: parsed.subjectSummary || "",
     relevantAreas: parsed.relevantAreas || [],
-    tokenWasteSources: parsed.tokenWasteSources || []
+    solverAnalysis
   });
+}
+
+function normalizeFinding(item) {
+  if (!item || typeof item !== "object") return null;
+  const type    = typeof item.type    === "string" ? item.type.trim()    : "";
+  const title   = typeof item.title   === "string" ? item.title.trim()   : "";
+  const content = typeof item.content === "string" ? item.content.trim() : "";
+  if (!type || !title || !content) return null;
+  return { type, title, content };
 }
 
 async function handleGithub(req, res) {

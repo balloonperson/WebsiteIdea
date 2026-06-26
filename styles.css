@@ -292,6 +292,66 @@ textarea {
   margin-top: 12px;
 }
 
+.solver-analysis-heading {
+  margin: 18px 0 10px;
+  font-size: 1rem;
+}
+
+.solver-analysis-panel {
+  max-height: min(40vh, 320px);
+  overflow-y: auto;
+  padding: 12px 14px;
+  border: 1px solid #dce3ef;
+  border-radius: 10px;
+  background: #fbfcff;
+}
+
+.solver-analysis-placeholder,
+.solver-analysis-loading,
+.solver-analysis-error,
+.solver-analysis-empty {
+  margin: 0;
+  color: #697386;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.solver-finding {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #eef0f5;
+}
+
+.solver-finding:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.solver-finding-type {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #087f5b;
+  margin-bottom: 3px;
+}
+
+.solver-finding-title {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #172033;
+}
+
+.solver-finding-content {
+  margin: 0;
+  color: #586174;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
 @media (max-width: 720px) {
   .path-grid,
   .subject-row {

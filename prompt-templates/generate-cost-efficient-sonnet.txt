@@ -219,7 +219,29 @@ Produce a subject-specific Sonnet solver with these required sections. The instr
 - Stopping Conditions (when Sonnet has enough information and when the task is complete)
 - Minimal Supporting Context (repository facts or navigation guidance required to apply the solver)
 
-The subjectSummary must be one sentence. The relevantAreas must be a list of paths or system names directly relevant to this subject. The tokenWasteSources must be specific descriptions of where Sonnet wastes tokens in this subject without the solver.
+The subjectSummary must be one sentence. The relevantAreas must be a list of paths or system names directly relevant to this subject.
+
+## Solver Analysis
+
+After generating the instructions, produce a curated ranked list of the most important findings that shaped the solver.
+
+Every finding must explain a decision made in the generated instructions, a relevant optimization opportunity, or a meaningful uncertainty that limited the solver. Do not include general repository observations that did not influence the solver.
+
+Before returning the list:
+1. Rank all candidate findings by: how strongly they change the model's workflow → how much reasoning, exploration, cost, or failure they may prevent → how specific they are to this repository and subject → how important they are for understanding the generated solver → how well supported they are by available evidence → how useful they are to the user reviewing the result.
+2. Merge findings that communicate the same underlying point.
+3. Remove generic observations that would apply to any project.
+4. Remove details that did not influence the solver, context policy, or evaluation of possible shortcuts.
+5. Preserve materially distinct findings even when the list becomes longer than usual.
+
+Aim for roughly 10 findings. Usually stay within 5–20. Use fewer than 5 only when fewer findings are genuinely important. Use more than 20 only when the subject is unusually complex and removing items would hide materially different insights. Do not add weak findings to reach a target count.
+
+For cost-efficient mode: favor findings about avoided output, unnecessary exploration, and skippable retries.
+
+Each finding must have:
+- type: a concise label such as uniqueness, method, shortcut, waste-source, verification, context, risk, assumption, stopping-condition — or any concise label that fits
+- title: a short descriptive phrase
+- content: a concise explanation of the finding and how it influenced the solver
 
 Return JSON only. Do not include markdown fences.
-{"subjectSummary":"one sentence describing the subject and its project context","relevantAreas":["path or system name"],"tokenWasteSources":["specific description of avoidable token waste"],"instructions":"full copyable Sonnet solver text with all required sections"}
+{"subjectSummary":"one sentence describing the subject and its project context","relevantAreas":["path or system name"],"solverAnalysis":[{"type":"uniqueness","title":"short descriptive phrase","content":"concise explanation"}],"instructions":"full copyable Sonnet solver text with all required sections"}

@@ -28,7 +28,8 @@ const els = {
   runError: document.querySelector("#run-error"),
   output: document.querySelector("#output"),
   copyButton: document.querySelector("#copy-button"),
-  clearButton: document.querySelector("#clear-button")
+  clearButton: document.querySelector("#clear-button"),
+  solverAnalysis: document.querySelector("#solver-analysis")
 };
 
 els.uploadInput.addEventListener("change", async (event) => {
@@ -107,6 +108,7 @@ els.runButton.addEventListener("click", async () => {
   state.instructions = "";
   els.output.value = "";
   els.copyButton.disabled = true;
+  renderSolverAnalysisState("loading");
   setLoading(els.runButton, true, "Running...");
   els.runStatus.textContent = "Analyzing project and generating instructions...";
 
@@ -126,9 +128,11 @@ els.runButton.addEventListener("click", async () => {
     els.output.value = response.instructions;
     els.copyButton.disabled = false;
     els.runStatus.textContent = "Instructions generated.";
+    renderSolverAnalysisState("results", response.solverAnalysis ?? []);
   } catch (error) {
     showError(els.runError, error.message);
     els.runStatus.textContent = "Generation failed.";
+    renderSolverAnalysisState("error");
   } finally {
     setLoading(els.runButton, false, "Run");
     updateRunState();
@@ -149,9 +153,11 @@ els.clearButton.addEventListener("click", () => {
   els.copyButton.disabled = true;
   clearError(els.runError);
   els.runStatus.textContent = "Output cleared.";
+  renderSolverAnalysisState("initial");
 });
 
 loadConfig();
+renderSolverAnalysisState("initial");
 
 async function handleZip(file) {
   clearError(els.uploadError);
@@ -209,6 +215,77 @@ function renderSuggestions(subjects) {
   if (!subjects.length) {
     showError(els.suggestError, "No suggestions were returned.");
   }
+}
+
+function renderSolverAnalysisState(status, items) {
+  const el = els.solverAnalysis;
+  el.innerHTML = "";
+  el.setAttribute("aria-busy", status === "loading" ? "true" : "false");
+
+  if (status === "initial") {
+    const p = document.createElement("p");
+    p.className = "solver-analysis-placeholder";
+    p.textContent = "Key solver findings will appear here after generation.";
+    el.append(p);
+    return;
+  }
+
+  if (status === "loading") {
+    const p = document.createElement("p");
+    p.className = "solver-analysis-loading";
+    p.textContent = "Analyzing…";
+    el.append(p);
+    return;
+  }
+
+  if (status === "error") {
+    const p = document.createElement("p");
+    p.className = "solver-analysis-error";
+    p.textContent = "Analysis unavailable.";
+    el.append(p);
+    return;
+  }
+
+  if (status === "results") {
+    const valid = (items || []).filter(
+      (item) => item && typeof item.type === "string" && typeof item.title === "string" && typeof item.content === "string"
+    );
+
+    if (!valid.length) {
+      const p = document.createElement("p");
+      p.className = "solver-analysis-empty";
+      p.textContent = "No findings were returned.";
+      el.append(p);
+      return;
+    }
+
+    for (const item of valid) {
+      const finding = document.createElement("div");
+      finding.className = "solver-finding";
+
+      const typeEl = document.createElement("span");
+      typeEl.className = "solver-finding-type";
+      typeEl.textContent = formatFindingType(item.type);
+
+      const titleEl = document.createElement("span");
+      titleEl.className = "solver-finding-title";
+      titleEl.textContent = item.title;
+
+      const contentEl = document.createElement("p");
+      contentEl.className = "solver-finding-content";
+      contentEl.textContent = item.content;
+
+      finding.append(typeEl, titleEl, contentEl);
+      el.append(finding);
+    }
+  }
+}
+
+function formatFindingType(type) {
+  return type
+    .trim()
+    .toLowerCase()
+    .replace(/[-_]+/g, " ");
 }
 
 function updateRunState() {
