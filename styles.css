@@ -768,6 +768,11 @@ textarea {
   justify-content: flex-end;
 }
 
+.modal[hidden],
+.drawer[hidden] {
+  display: none;
+}
+
 .modal-backdrop,
 .drawer-backdrop {
   position: absolute;
