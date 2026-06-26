@@ -40,7 +40,7 @@ function baseRunInput(overrides = {}) {
 
 test("migrations apply and report a schema version", () => {
   const { db } = freshEngine();
-  assert.equal(getSchemaVersion(db), 1);
+  assert.equal(getSchemaVersion(db), 2);
   db.close();
 });
 
@@ -457,7 +457,7 @@ test("exportRun produces a complete, self-describing snapshot of a run", () => {
   const exported = engine.exportRun(run.id);
 
   assert.equal(exported.run.id, run.id);
-  assert.equal(exported.schemaVersion, 1);
+  assert.equal(exported.schemaVersion, 2);
   assert.equal(exported.candidateSolvers.length, 1);
   assert.equal(exported.candidateEvaluations.length, 1);
   assert.equal(exported.championSlots.currentChampion.candidateSolverId, solver.id);

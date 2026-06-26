@@ -1,0 +1,17 @@
+Propose a diverse batch of evaluation tasks for a coding agent that will be scored against this exact repository and this exact subject only. Every task must be something that can actually be attempted and objectively checked in this repo — no task about a feature, file, or behavior that doesn't exist here.
+
+For each task, return:
+- "prompt": the literal task text to hand to the solver, specific enough to act on without guessing.
+- "taskFamily": a short slug grouping similar tasks (e.g. "retry-logic", "input-validation").
+- "subjectBoundary": one sentence stating what is in scope and what is out of scope for this task within the subject.
+- "repoEvidence": the concrete file(s) or behavior in this repo that justifies the task existing.
+- "difficulty": one of trivial, easy, medium, hard, expert.
+- "requiredBehavior": array of strings describing what a correct solution must do.
+- "forbiddenBehavior": array of strings describing what a correct solution must NOT do.
+- "expectedTouchedAreas": array of file paths or path globs a correct solution should touch.
+- "fileScope": "single" or "multi" depending on whether a correct fix should span more than one file.
+- "verificationMethod": a concrete, objective way to check correctness (e.g. "run test/foo.test.js", "diff must not touch lib/bar.js").
+- "hiddenAssertions": array of strings — specific checks used only at verification time, never shown to a solver or to a mutation/generation step.
+- "failureMode": short label for the most likely way a solver botches this task.
+
+Return strict JSON: { "tasks": [ ... ] }. Do not include markdown fences or commentary.
