@@ -3,119 +3,444 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Coding Agent Instruction Generator</title>
+    <title>Repository-Subject Evolution Console</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="model-banner" id="model-banner">
       Current instruction-generator model: loading...
     </div>
+
+    <nav class="tab-bar" id="tab-bar">
+      <button class="tab-button active" type="button" data-tab="generate">Generate</button>
+      <button class="tab-button" type="button" data-tab="evolve">Evolve</button>
+      <button class="tab-button" type="button" data-tab="tasks">Tasks</button>
+      <button class="tab-button" type="button" data-tab="admin">Admin</button>
+    </nav>
+
     <main class="page">
-      <header class="hero">
-        <p class="eyebrow">Cost-efficient coding-agent setup</p>
-        <h1>Generate project-specific instructions</h1>
-        <p>
-          Upload a zipped project, choose the model and subject, then generate a focused instruction profile.
-        </p>
-      </header>
+      <!-- ============================= GENERATE TAB ============================= -->
+      <section class="tab-panel active" id="tab-generate" data-tab-panel="generate">
+        <header class="hero">
+          <p class="eyebrow">Cost-efficient coding-agent setup</p>
+          <h1>Generate project-specific instructions</h1>
+          <p>
+            Upload a zipped project, choose the model and subject, then generate a focused instruction profile.
+          </p>
+        </header>
 
-      <section class="card">
-        <label class="section-label" for="project-upload">1. Import project</label>
-        <div class="upload-box" id="upload-box">
-          <input id="project-upload" type="file" accept=".zip,application/zip" />
-          <p><strong>Choose a .zip project file</strong> or drop it here.</p>
-          <small>Generated folders and large/binary files are skipped automatically.</small>
-        </div>
-        <p class="status" id="upload-status">No project uploaded yet.</p>
-        <p class="error" id="upload-error" hidden></p>
-        <div class="or-divider"><span>or</span></div>
-        <div class="github-row">
-          <input id="github-url" type="url" placeholder="https://github.com/owner/repo" />
-          <button id="github-load-button" type="button">Load from GitHub</button>
-        </div>
-        <p class="status" id="github-status"></p>
-        <p class="error" id="github-error" hidden></p>
-      </section>
+        <section class="card">
+          <label class="section-label" for="project-upload">1. Import project</label>
+          <div class="upload-box" id="upload-box">
+            <input id="project-upload" type="file" accept=".zip,application/zip" />
+            <p><strong>Choose a .zip project file</strong> or drop it here.</p>
+            <small>Generated folders and large/binary files are skipped automatically.</small>
+          </div>
+          <p class="status" id="upload-status">No project uploaded yet.</p>
+          <p class="error" id="upload-error" hidden></p>
+          <div class="or-divider"><span>or</span></div>
+          <div class="github-row">
+            <input id="github-url" type="url" placeholder="https://github.com/owner/repo" />
+            <button id="github-load-button" type="button">Load from GitHub</button>
+          </div>
+          <p class="status" id="github-status"></p>
+          <p class="error" id="github-error" hidden></p>
+        </section>
 
-      <section class="card grid-card">
-        <div>
-          <label class="section-label" for="model-select">2. Model to optimize for</label>
-          <select id="model-select">
-            <option value="">Select a model</option>
-            <option value="Claude Sonnet">Claude Sonnet</option>
-            <option value="Claude Opus">Claude Opus</option>
-            <option value="GPT">GPT</option>
-            <option value="Gemini">Gemini</option>
-            <option value="Other">Other</option>
+        <section class="card grid-card">
+          <div>
+            <label class="section-label" for="model-select">2. Model to optimize for</label>
+            <select id="model-select">
+              <option value="">Select a model</option>
+              <option value="Claude Sonnet">Claude Sonnet</option>
+              <option value="Claude Opus">Claude Opus</option>
+              <option value="GPT">GPT</option>
+              <option value="Gemini">Gemini</option>
+              <option value="Other">Other</option>
+            </select>
+            <input id="other-model" type="text" placeholder="Enter model name" hidden />
+          </div>
+        </section>
+
+        <section class="card">
+          <label class="section-label">3. Optimization path</label>
+          <div class="path-grid">
+            <button class="path-card active" type="button" data-path="cost">
+              <strong>Cost Efficient</strong>
+              <span>Reduce unnecessary investigation and tool use while keeping enough evidence.</span>
+            </button>
+            <button class="path-card inactive" type="button" aria-label="Balanced coming soon">
+              <strong>Balanced</strong>
+              <span>Coming soon</span>
+            </button>
+            <button class="path-card inactive" type="button" aria-label="Maximum Performance coming soon">
+              <strong>Maximum Performance</strong>
+              <span>Coming soon</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="card">
+          <label class="section-label" for="subject-input">4. Subject to optimize for</label>
+          <div class="subject-row">
+            <input
+              id="subject-input"
+              type="text"
+              placeholder="Example: Authentication UI, enemy navigation, feature/my-branch"
+            />
+            <button id="suggest-button" type="button" disabled>Suggest Subjects</button>
+          </div>
+          <p class="help-text">
+            This can be a branch name, feature area, development topic, or any scope you want the instructions focused on.
+          </p>
+          <select id="suggestions-select" hidden>
+            <option value="">Choose a suggested subject</option>
           </select>
-          <input id="other-model" type="text" placeholder="Enter model name" hidden />
-        </div>
+          <p class="error" id="suggest-error" hidden></p>
+        </section>
+
+        <section class="run-section">
+          <button id="run-button" class="run-button" type="button" disabled>Run</button>
+          <p class="status" id="run-status">Upload a project, select a model, and enter a subject to begin.</p>
+        </section>
+
+        <section class="card">
+          <label class="section-label" for="output">Generated Instructions</label>
+          <textarea id="output" readonly placeholder="Generated instructions will appear here."></textarea>
+          <div class="actions">
+            <button id="copy-button" type="button" disabled>Copy</button>
+            <button id="clear-button" type="button">Clear</button>
+          </div>
+          <p class="error" id="run-error" hidden></p>
+          <h3 id="solver-analysis-heading" class="section-label solver-analysis-heading">
+            Key Solver Findings
+          </h3>
+          <div
+            id="solver-analysis"
+            class="solver-analysis-panel"
+            aria-labelledby="solver-analysis-heading"
+            aria-live="polite"
+            aria-busy="false"
+          ></div>
+        </section>
       </section>
 
-      <section class="card">
-        <label class="section-label">3. Optimization path</label>
-        <div class="path-grid">
-          <button class="path-card active" type="button" data-path="cost">
-            <strong>Cost Efficient</strong>
-            <span>Reduce unnecessary investigation and tool use while keeping enough evidence.</span>
-          </button>
-          <button class="path-card inactive" type="button" aria-label="Balanced coming soon">
-            <strong>Balanced</strong>
-            <span>Coming soon</span>
-          </button>
-          <button class="path-card inactive" type="button" aria-label="Maximum Performance coming soon">
-            <strong>Maximum Performance</strong>
-            <span>Coming soon</span>
-          </button>
-        </div>
+      <!-- ============================= EVOLVE TAB ============================= -->
+      <section class="tab-panel" id="tab-evolve" data-tab-panel="evolve">
+        <header class="hero">
+          <p class="eyebrow">Repository-subject evolution lab</p>
+          <h1>Evolve a solver for one repo and one subject</h1>
+          <p>
+            Configure a run, then let it generate and screen candidate instructions in Simulated Eval mode.
+            Simulated results can only ever produce a <strong>Predicted Leader</strong> &mdash; never a Verified Leader.
+          </p>
+        </header>
+
+        <section class="card">
+          <label class="section-label" for="evolve-project-upload">1. Repository context</label>
+          <div class="upload-box" id="evolve-upload-box">
+            <input id="evolve-project-upload" type="file" accept=".zip,application/zip" />
+            <p><strong>Choose a .zip project file</strong> or drop it here.</p>
+          </div>
+          <p class="status" id="evolve-upload-status">No project loaded yet.</p>
+          <div class="or-divider"><span>or</span></div>
+          <div class="github-row">
+            <input id="evolve-github-url" type="url" placeholder="https://github.com/owner/repo" />
+            <button id="evolve-github-load-button" type="button">Load from GitHub</button>
+          </div>
+          <p class="error" id="evolve-upload-error" hidden></p>
+        </section>
+
+        <section class="card grid-card evolve-basics-grid">
+          <div>
+            <label class="section-label" for="evolve-repo-identifier">Repo identifier</label>
+            <input id="evolve-repo-identifier" type="text" placeholder="github.com/owner/repo" />
+          </div>
+          <div>
+            <label class="section-label" for="evolve-subject">Subject (exact scope)</label>
+            <input id="evolve-subject" type="text" placeholder="Example: payment retry logic" />
+          </div>
+          <div>
+            <label class="section-label" for="evolve-target-model">Target model</label>
+            <input id="evolve-target-model" type="text" placeholder="claude-sonnet-4-5" />
+          </div>
+        </section>
+
+        <section class="card run-controls-card">
+          <div class="run-controls-row">
+            <button id="evolve-settings-button" type="button" class="secondary-button">Settings</button>
+            <span class="objective-badge" id="evolve-objective-badge">Objective: Cost Efficient</span>
+            <div class="spacer"></div>
+            <button id="evolve-start-button" type="button" class="run-button run-button-compact">Start run</button>
+            <button id="evolve-cancel-button" type="button" class="secondary-button" hidden>Cancel</button>
+            <button id="evolve-resume-button" type="button" class="secondary-button" hidden>Resume</button>
+          </div>
+          <p class="error" id="evolve-start-error" hidden></p>
+        </section>
+
+        <section class="card" id="evolve-status-card">
+          <label class="section-label">Live status</label>
+          <div class="run-summary-header" id="evolve-run-summary">
+            <p class="solver-analysis-placeholder">No run started yet.</p>
+          </div>
+          <div class="event-log" id="evolve-event-log" aria-live="polite"></div>
+        </section>
       </section>
 
-      <section class="card">
-        <label class="section-label" for="subject-input">4. Subject to optimize for</label>
-        <div class="subject-row">
-          <input
-            id="subject-input"
-            type="text"
-            placeholder="Example: Authentication UI, enemy navigation, feature/my-branch"
-          />
-          <button id="suggest-button" type="button" disabled>Suggest Subjects</button>
-        </div>
-        <p class="help-text">
-          This can be a branch name, feature area, development topic, or any scope you want the instructions focused on.
-        </p>
-        <select id="suggestions-select" hidden>
-          <option value="">Choose a suggested subject</option>
-        </select>
-        <p class="error" id="suggest-error" hidden></p>
+      <!-- ============================= TASKS TAB ============================= -->
+      <section class="tab-panel" id="tab-tasks" data-tab-panel="tasks">
+        <header class="hero">
+          <p class="eyebrow">Task lab</p>
+          <h1>Suggest, author, and review the task set</h1>
+          <p>Tasks are what every candidate solver is actually scored against. A run with no tasks is unverifiable.</p>
+        </header>
+
+        <section class="card">
+          <label class="section-label" for="tasks-run-select">Run</label>
+          <select id="tasks-run-select">
+            <option value="">Select a run...</option>
+          </select>
+          <p class="help-text">Tasks are scoped to the run selected here (or created without a run as reusable drafts).</p>
+        </section>
+
+        <section class="card">
+          <label class="section-label">Suggest tasks</label>
+          <div class="subject-row">
+            <input id="tasks-suggest-subject" type="text" placeholder="Subject to suggest tasks for" />
+            <button id="tasks-suggest-button" type="button">Suggest</button>
+          </div>
+          <div id="tasks-suggestions" class="task-suggestions"></div>
+          <p class="error" id="tasks-suggest-error" hidden></p>
+        </section>
+
+        <section class="card">
+          <label class="section-label">Add a task manually</label>
+          <div class="grid-card task-form-grid">
+            <input id="tasks-new-family" type="text" placeholder="Task family (e.g. retry-logic)" />
+            <textarea id="tasks-new-prompt" placeholder="Task prompt the agent must solve" rows="3"></textarea>
+            <input id="tasks-new-criteria" type="text" placeholder="Expected criteria, comma separated" />
+            <label class="checkbox-row"><input id="tasks-new-held-out" type="checkbox" /> Hold out (excluded from primary scoring)</label>
+            <button id="tasks-add-button" type="button">Add task</button>
+          </div>
+          <p class="error" id="tasks-add-error" hidden></p>
+        </section>
+
+        <section class="card">
+          <label class="section-label">Task set</label>
+          <div id="tasks-list" class="task-list"></div>
+        </section>
       </section>
 
-      <section class="run-section">
-        <button id="run-button" class="run-button" type="button" disabled>Run</button>
-        <p class="status" id="run-status">Upload a project, select a model, and enter a subject to begin.</p>
-      </section>
+      <!-- ============================= ADMIN TAB ============================= -->
+      <section class="tab-panel" id="tab-admin" data-tab-panel="admin">
+        <header class="hero">
+          <p class="eyebrow">Run observability</p>
+          <h1>Admin console</h1>
+          <p>What is happening now, why, and whether it is predicted or verified.</p>
+        </header>
 
-      <section class="card">
-        <label class="section-label" for="output">Generated Instructions</label>
-        <textarea id="output" readonly placeholder="Generated instructions will appear here."></textarea>
-        <div class="actions">
-          <button id="copy-button" type="button" disabled>Copy</button>
-          <button id="clear-button" type="button">Clear</button>
+        <section class="card">
+          <label class="section-label" for="admin-run-select">Run</label>
+          <select id="admin-run-select">
+            <option value="">Select a run...</option>
+          </select>
+        </section>
+
+        <section class="card run-summary-header" id="admin-run-summary">
+          <p class="solver-analysis-placeholder">Select a run to see its summary.</p>
+        </section>
+
+        <div class="admin-grid">
+          <section class="card">
+            <label class="section-label">Candidate lineage</label>
+            <div id="admin-lineage-tree" class="lineage-tree"></div>
+          </section>
+
+          <section class="card">
+            <label class="section-label">Current experiment</label>
+            <div id="admin-current-experiment"></div>
+          </section>
         </div>
-        <p class="error" id="run-error" hidden></p>
-        <h3 id="solver-analysis-heading" class="section-label solver-analysis-heading">
-          Key Solver Findings
-        </h3>
-        <div
-          id="solver-analysis"
-          class="solver-analysis-panel"
-          aria-labelledby="solver-analysis-heading"
-          aria-live="polite"
-          aria-busy="false"
-        ></div>
+
+        <section class="card">
+          <label class="section-label">Instruction diff (selected candidate vs. its parent)</label>
+          <div id="admin-instruction-diff" class="instruction-diff"></div>
+        </section>
+
+        <section class="card">
+          <label class="section-label">Cycle improvement (after noise aggregation)</label>
+          <div id="admin-cycle-chart" class="chart-container"></div>
+        </section>
+
+        <section class="card">
+          <label class="section-label">Token &amp; cost per cycle</label>
+          <div id="admin-cost-chart" class="chart-container"></div>
+        </section>
+
+        <section class="card">
+          <label class="section-label">Noise-trial aggregate table</label>
+          <div id="admin-noise-table"></div>
+        </section>
+
+        <section class="card">
+          <label class="section-label">Exploit cards</label>
+          <div id="admin-exploit-cards" class="exploit-card-grid"></div>
+        </section>
+
+        <section class="card">
+          <label class="section-label">Task set</label>
+          <div id="admin-task-set"></div>
+        </section>
+
+        <section class="card">
+          <label class="section-label">Evidence panel</label>
+          <div id="admin-evidence-panel"></div>
+        </section>
       </section>
     </main>
 
+    <!-- ============================= TRACE DRAWER ============================= -->
+    <div class="drawer" id="trace-drawer" hidden>
+      <div class="drawer-backdrop" id="trace-drawer-backdrop"></div>
+      <div class="drawer-panel">
+        <div class="drawer-header">
+          <h2>Evaluation trace</h2>
+          <button id="trace-drawer-close" type="button" class="secondary-button">Close</button>
+        </div>
+        <div class="drawer-body" id="trace-drawer-body"></div>
+      </div>
+    </div>
+
+    <!-- ============================= SETTINGS MODAL ============================= -->
+    <div class="modal" id="settings-modal" hidden>
+      <div class="modal-backdrop" id="settings-modal-backdrop"></div>
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h2>Run settings</h2>
+          <button id="settings-close-button" type="button" class="secondary-button">Close</button>
+        </div>
+        <div class="modal-body">
+          <section class="settings-group">
+            <h3>Basic</h3>
+            <label>Runner mode
+              <select id="settings-runner-mode">
+                <option value="simulated">Simulated Eval</option>
+                <option value="dual" selected>Dual (simulated now, real pending Branch 3)</option>
+                <option value="real">Real Worktree (not connected)</option>
+              </select>
+            </label>
+            <label>Objective profile
+              <select id="settings-objective-profile">
+                <option value="quality">Quality</option>
+                <option value="cost-efficient" selected>Cost Efficient</option>
+                <option value="balanced">Balanced</option>
+                <option value="custom">Custom</option>
+              </select>
+            </label>
+            <div class="settings-row">
+              <label>Dual split (simulated %)
+                <input id="settings-dual-simulated-split" type="number" min="0" max="100" value="70" />
+              </label>
+              <label>Cycles (max)
+                <input id="settings-max-cycles" type="number" min="1" value="8" />
+              </label>
+              <label>Noise trials per evaluation
+                <input id="settings-noise-trials" type="number" min="1" max="10" value="3" />
+              </label>
+              <label>Candidates per cycle
+                <input id="settings-candidates-per-cycle" type="number" min="1" max="6" value="2" />
+              </label>
+            </div>
+            <div class="settings-row" id="settings-custom-weights" hidden>
+              <label>Correctness weight
+                <input id="settings-weight-correctness" type="number" min="0" max="1" step="0.05" value="0.6" />
+              </label>
+              <label>Cost weight
+                <input id="settings-weight-cost" type="number" min="0" max="1" step="0.05" value="0.25" />
+              </label>
+              <label>Token weight
+                <input id="settings-weight-tokens" type="number" min="0" max="1" step="0.05" value="0.15" />
+              </label>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <h3>Budget</h3>
+            <div class="settings-row">
+              <label>Max spend (USD)
+                <input id="settings-max-spend" type="number" min="0" step="0.5" placeholder="No limit" />
+              </label>
+              <label>Reserved real attempts
+                <input id="settings-reserved-real-attempts" type="number" min="0" value="0" />
+              </label>
+              <label>Early-stop patience (cycles)
+                <input id="settings-no-improvement-window" type="number" min="1" value="3" />
+              </label>
+              <label>Max real runs <span class="hint">(informational; real runner not connected)</span>
+                <input id="settings-max-real-runs" type="number" min="0" placeholder="N/A" disabled />
+              </label>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <h3>Quality gates</h3>
+            <div class="settings-row">
+              <label>Correctness threshold (min pass rate)
+                <input id="settings-correctness-threshold" type="number" min="0" max="1" step="0.05" value="0.75" />
+              </label>
+              <label>Critical-failure policy
+                <select id="settings-critical-failure-policy">
+                  <option value="block" selected>Block on any critical failure</option>
+                  <option value="tolerate-low">Tolerate up to 10% critical failure rate</option>
+                </select>
+              </label>
+              <label>Significance threshold (min effect size)
+                <input id="settings-min-effect-size" type="number" min="0" step="0.05" value="0.4" />
+              </label>
+            </div>
+          </section>
+
+          <section class="settings-group">
+            <h3>Knowledge</h3>
+            <label class="checkbox-row">
+              <input id="settings-knowledge-influences-mutation" type="checkbox" checked />
+              Allow claimed/predicted knowledge to influence mutations
+            </label>
+          </section>
+
+          <section class="settings-group">
+            <h3>Real runner <span class="status-pill status-pill-warning">Not connected</span></h3>
+            <p class="help-text">
+              Real worktree execution is owned by the worktree-runner branch and is not wired into this build.
+              These fields are stored with the run for when it is connected; runs will only produce Simulated Eval results until then.
+            </p>
+            <div class="settings-row">
+              <label>Command profile
+                <input id="settings-real-command-profile" type="text" placeholder="e.g. npm test" />
+              </label>
+              <label>Timeout (seconds)
+                <input id="settings-real-timeout" type="number" min="1" placeholder="120" />
+              </label>
+              <label>Retention (days)
+                <input id="settings-real-retention" type="number" min="0" placeholder="7" />
+              </label>
+              <label>Concurrency
+                <input id="settings-real-concurrency" type="number" min="1" placeholder="1" />
+              </label>
+            </div>
+          </section>
+        </div>
+        <div class="modal-footer">
+          <button id="settings-save-button" type="button" class="run-button run-button-compact">Save settings</button>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/tabs.js"></script>
+    <script type="module" src="js/evolve.js"></script>
+    <script type="module" src="js/tasks.js"></script>
+    <script type="module" src="js/admin.js"></script>
   </body>
 </html>

@@ -6,11 +6,19 @@ import { fileURLToPath } from "node:url";
 import { callAi, parseJsonResponse } from "./lib/ai.js";
 import { fetchRepoFiles } from "./lib/github.js";
 import { buildGeneratePrompt, buildSuggestPrompt } from "./lib/prompts.js";
+import { openEvolutionDatabase, createEvolutionEngine } from "./lib/evolution-core/index.js";
+import { createOrchestrator } from "./lib/evolution-orchestrator/index.js";
+import { createEvolutionRoutes } from "./lib/evolutionRoutes.js";
 
 const port = process.env.PORT || 3000;
 const host = process.env.HOST || "127.0.0.1";
 const MAX_CONTEXT_CHARS = 150000;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const evolutionDb = openEvolutionDatabase();
+const evolutionEngine = createEvolutionEngine(evolutionDb);
+const orchestrator = createOrchestrator(evolutionEngine);
+const evolutionRoutes = createEvolutionRoutes({ engine: evolutionEngine, orchestrator });
 
 const server = createServer(async (req, res) => {
   try {
@@ -32,6 +40,12 @@ const server = createServer(async (req, res) => {
 
     if (req.method === "POST" && url.pathname === "/api/github") {
       return await handleGithub(req, res);
+    }
+
+    if (url.pathname.startsWith("/api/evolution/") || url.pathname.startsWith("/api/tasks")) {
+      const handled = await evolutionRoutes(req, res, url);
+      if (handled) return;
+      return sendJson(res, 404, { error: "Not found." });
     }
 
     if (req.method === "GET") {
