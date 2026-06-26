@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node --check lib/ai.js && node --check lib/prompts.js && find lib/evolution-core -name '*.js' -exec node --check {} +",
+    "check": "node --check server.js && node --check lib/ai.js && node --check lib/prompts.js && find lib/evolution-core -name '*.js' -exec node --check {} + && find lib/worktree-runner -name '*.js' -exec node --check {} +",
     "test": "node --test test/*.test.js"
   },
   "dependencies": {
